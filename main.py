@@ -2,6 +2,10 @@
 
 import re
 
+
+categories = ['Beach', 'Coast', 'Ocean']  # TODO: add as cmdline arguments
+
+
 def get_args():
     import argparse
     parser = argparse.ArgumentParser(
@@ -38,7 +42,15 @@ def get_results(url):
                 'price': price,
                 'km': next(search_by_regexp(re_km, tags), None),
                 'year': next(search_by_regexp(re_year, tags), None),
+                'category': ''
             }
+            if categories:
+                text = item['name'].lower()
+                for category in categories:
+                    if category.lower() in text:
+                        item['category'] = category
+                        break
+
             results.append(item)
 
         next_page = page.soup.select('a.pagination-next')
@@ -54,4 +66,4 @@ if __name__ == '__main__':
     results = get_results(args.url)
     for result in results:
         if result['km'] and result['year']:
-            print("\"{name}\",{km},{year},{price}".format(**result))
+            print("\"{name}\",{km},{year},{price},{category}".format(**result))
